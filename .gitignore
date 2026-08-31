@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Next.js
+frontend/node_modules/
+frontend/.next/
+
+# Uploaded documents
+backend/uploads/
+
+# Local databases
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
