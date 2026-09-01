@@ -1,14 +1,24 @@
 import uuid 
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
-from app.schemas import TokenResponse, UserLoginRequest, UserRegisterRequest, UserResponse
-from app.security import create_access_token, decode_access_token, hash_password, verify_password
-
+from app.schemas import (
+    TokenResponse,
+    UserLoginRequest,
+    UserRegisterRequest,
+    UserResponse,
+)
+from app.security import (
+    create_access_token,
+    decode_access_token,
+    hash_password,
+    verify_password,
+)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -67,12 +77,15 @@ def register(payload: UserRegisterRequest, db: Session=Depends(get_db),):
     return user 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: UserLoginRequest, db:Session=Depends(get_db)):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
     invalid_credentials_exceptions = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Incorrect email or password"
     )
-    normalized_email = payload.email.strip().lower()
+    normalized_email = form_data.username.strip().lower()
     user = (
         db.query(User).filter(
             User.email==normalized_email
@@ -81,7 +94,7 @@ def login(payload: UserLoginRequest, db:Session=Depends(get_db)):
     if user is None:
         raise invalid_credentials_exceptions
     if not verify_password(
-        payload.password,
+        form_data.password,
         user.hashed_password
     ):
         raise invalid_credentials_exceptions
