@@ -41,7 +41,6 @@ class DocumentResponse(BaseModel):
     word_count: int | None
     character_count: int | None
     created_at: datetime
-    uploaded_at: datetime
 
 class SummaryRequest(BaseModel):
     summary_type: Literal["brief", "detailed", "key_points"] = "brief"
