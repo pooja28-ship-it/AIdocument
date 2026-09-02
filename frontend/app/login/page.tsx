@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -20,23 +19,36 @@ export default function LoginPage() {
     setMessage("");
 
     try {
+      const formData = new URLSearchParams();
+
+      formData.append("username", email);
+      formData.append("password", password);
+
       const data = await apiRequest("/auth/login", {
         method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
       });
+
+      if (!data?.access_token) {
+        throw new Error(
+          "Login succeeded but no access token was returned."
+        );
+      }
 
       saveToken(data.access_token);
 
-      router.push("/");
+      router.replace("/");
     } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Login failed."
-      );
+      if (error instanceof Error) {
+        setMessage(error.message);
+      } else if (typeof error === "string") {
+        setMessage(error);
+      } else {
+        setMessage("Login failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -64,9 +76,7 @@ export default function LoginPage() {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
             />
           </div>
 
@@ -80,13 +90,12 @@ export default function LoginPage() {
               type="password"
               placeholder="Your password"
               value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
+              onChange={(event) => setPassword(event.target.value)}
             />
           </div>
 
           <button
+            type="button"
             onClick={login}
             disabled={loading}
             className="w-full rounded-lg bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
@@ -114,4 +123,3 @@ export default function LoginPage() {
     </main>
   );
 }
-
