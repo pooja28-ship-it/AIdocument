@@ -206,8 +206,9 @@ def summarize_document(document_id: uuid.UUID, payload: SummaryRequest, db: Sess
 
         return document
 
-    except Exception:
+    except Exception as e:
         db.rollback()
+        print("SUMMARY ERROR:", repr(e))
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
