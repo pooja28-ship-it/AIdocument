@@ -67,6 +67,7 @@ export default function DashboardPage() {
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
+
     setSelectedFile(file);
     setUploadError("");
     setUploadSuccess("");
@@ -208,6 +209,16 @@ export default function DashboardPage() {
               <p className="text-gray-600">
                 Pages: {document.page_count ?? "—"}
               </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(`/dashboard/${document.id}`)
+                }
+                className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-white"
+              >
+                View Document
+              </button>
             </div>
           ))}
 
